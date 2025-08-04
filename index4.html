@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <title>Base de données - Cmonavis</title>
+
+  <!-- DataTables CSS -->
+  <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/jquery.dataTables.min.css">
+  <style>
+    body {
+      font-family: sans-serif;
+      padding: 2rem;
+      background-color: #f0f8ff;
+    }
+
+    h1 {
+      margin-bottom: 1rem;
+    }
+
+    select {
+      padding: 0.5rem;
+      font-size: 1rem;
+      margin-bottom: 1rem;
+    }
+
+    table {
+      width: 100%;
+    }
+  </style>
+</head>
+<body>
+
+  <h1>Base de données Cmonavis 📱</h1>
+
+  <label for="yearSelect">Choisissez une année :</label>
+  <select id="yearSelect">
+    <option value="2025" selected>2025</option>
+    <option value="2024">2024</option>
+    <option value="2023">2023</option>
+    <option value="2022">2022</option>
+  </select>
+
+  <table id="data-table" class="display">
+    <thead></thead>
+    <tbody></tbody>
+  </table>
+
+  <!-- jQuery + DataTables -->
+  <script src="https://code.jquery.com/jquery-3.7.0.min.js"></script>
+  <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
+
+  <script>
+    const API_BASE = "https://sheetdb.io/api/v1/03u0crxmqjt04/sheets/";
+    let dataTable = null;
+
+    function loadData(year) {
+      fetch(API_BASE + year)
+        .then(response => response.json())
+        .then(data => {
+          const table = document.getElementById("data-table");
+          const thead = table.querySelector("thead");
+          const tbody = table.querySelector("tbody");
+
+          // Réinitialiser le tableau
+          thead.innerHTML = "";
+          tbody.innerHTML = "";
+
+          if (data.length === 0) {
+            thead.innerHTML = "<tr><th>Aucune donnée</th></tr>";
+            return;
+          }
+
+          // Trier en ordre inverse (dernières lignes en haut)
+          data.reverse();
+
+          const headers = Object.keys(data[0]);
+
+          // Entêtes
+          const headRow = document.createElement("tr");
+          headers.forEach(header => {
+            const th = document.createElement("th");
+            th.textContent = header;
+            headRow.appendChild(th);
+          });
+          thead.appendChild(headRow);
+
+          // Données
+          data.forEach(row => {
+            const tr = document.createElement("tr");
+            headers.forEach(header => {
+              const td = document.createElement("td");
+              td.textContent = row[header];
+              tr.appendChild(td);
+            });
+            tbody.appendChild(tr);
+          });
+
+          // Rafraîchir DataTables
+          if (dataTable) {
+            dataTable.destroy();
+          }
+          dataTable = $('#data-table').DataTable({
+            order: [] // Supprime le tri automatique par DataTables
+          });
+        })
+        .catch(error => {
+          console.error("Erreur lors du chargement :", error);
+        });
+    }
+
+    // Chargement initial
+    document.addEventListener("DOMContentLoaded", function () {
+      const yearSelect = document.getElementById("yearSelect");
+      loadData(yearSelect.value);
+
+      yearSelect.addEventListener("change", function () {
+        loadData(this.value);
+      });
+    });
+  </script>
+</body>
+</html>
