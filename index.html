@@ -39,9 +39,12 @@
     <option value="2024">2024</option>
     <option value="2023">2023</option>
     <option value="2022">2022</option>
+    <option value="2021">2021</option>
+    <option value="2020">2020</option>
+    <option value="2019">2019</option>
+    <option value="2018">2018</option>
+    <option value="2017">2017</option>
   </select>
-
- 
 
   <table id="data-table" class="display">
     <thead></thead>
@@ -55,37 +58,6 @@
   <script>
     const BASE_URL = "https://sheetdb.io/api/v1/03u0crxmqjt04";
     let dataTable = null;
-    let currentData = [];
-
-    function populateFilters(data) {
-      const brandSelect = document.getElementById("brandFilter");
-      brandSelect.innerHTML = '<option value="">Toutes</option>';
-      const brands = [...new Set(data.map(row => row["Marque"]))].sort();
-      brands.forEach(brand => {
-        if (brand && brand.trim() !== "") {
-          const option = document.createElement("option");
-          option.value = brand;
-          option.textContent = brand;
-          brandSelect.appendChild(option);
-        }
-      });
-    }
-
-    function applyFilters() {
-      const brand = document.getElementById("brandFilter").value;
-      const note = document.getElementById("noteFilter").value;
-
-      let filtered = [...currentData];
-
-      if (brand) {
-        filtered = filtered.filter(row => row["Marque"] === brand);
-      }
-      if (note) {
-        filtered = filtered.filter(row => row["Note"] === note);
-      }
-
-      renderTable(filtered);
-    }
 
     function renderTable(data) {
       const table = document.getElementById("data-table");
@@ -134,8 +106,6 @@
         .then(response => response.json())
         .then(data => {
           data.reverse();
-          currentData = data;
-          populateFilters(data);
           renderTable(data);
         })
         .catch(error => {
@@ -145,19 +115,12 @@
 
     document.addEventListener("DOMContentLoaded", function () {
       const yearSelect = document.getElementById("yearSelect");
-      const brandSelect = document.getElementById("brandFilter");
-      const noteSelect = document.getElementById("noteFilter");
-
       loadData(yearSelect.value);
 
       yearSelect.addEventListener("change", function () {
         loadData(this.value);
       });
-
-      brandSelect.addEventListener("change", applyFilters);
-      noteSelect.addEventListener("change", applyFilters);
     });
   </script>
 </body>
 </html>
-
