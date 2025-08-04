@@ -2,7 +2,7 @@
 <html lang="fr">
 <head>
   <meta charset="UTF-8">
-  <title>Base de données - Cmonavis</title>
+  <title>Base de données Cmonavis</title>
 
   <!-- DataTables CSS -->
   <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/jquery.dataTables.min.css">
@@ -50,18 +50,19 @@
   <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
 
   <script>
-    const API_BASE = "https://sheetdb.io/api/v1/03u0crxmqjt04/sheets/";
+    const BASE_URL = "https://sheetdb.io/api/v1/03u0crxmqjt04";
+
     let dataTable = null;
 
     function loadData(year) {
-      fetch(API_BASE + year)
+      fetch(`${BASE_URL}?sheet=${year}`)
         .then(response => response.json())
         .then(data => {
           const table = document.getElementById("data-table");
           const thead = table.querySelector("thead");
           const tbody = table.querySelector("tbody");
 
-          // Réinitialiser le tableau
+          // Réinitialisation
           thead.innerHTML = "";
           tbody.innerHTML = "";
 
@@ -70,12 +71,12 @@
             return;
           }
 
-          // Trier en ordre inverse (dernières lignes en haut)
+          // Inverser pour afficher les lignes les plus récentes en haut
           data.reverse();
 
           const headers = Object.keys(data[0]);
 
-          // Entêtes
+          // Créer les en-têtes
           const headRow = document.createElement("tr");
           headers.forEach(header => {
             const th = document.createElement("th");
@@ -84,7 +85,7 @@
           });
           thead.appendChild(headRow);
 
-          // Données
+          // Créer les lignes
           data.forEach(row => {
             const tr = document.createElement("tr");
             headers.forEach(header => {
@@ -95,12 +96,12 @@
             tbody.appendChild(tr);
           });
 
-          // Rafraîchir DataTables
+          // Activer ou recharger DataTable
           if (dataTable) {
             dataTable.destroy();
           }
           dataTable = $('#data-table').DataTable({
-            order: [] // Supprime le tri automatique par DataTables
+            order: [] // pas de tri automatique
           });
         })
         .catch(error => {
